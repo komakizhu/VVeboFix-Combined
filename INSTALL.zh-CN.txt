@@ -1,0 +1,27 @@
+VVeboFix 1.0.1 — Relaxin / RootHide 手机测试包
+
+目标环境：iPhone 15 Pro Max，iOS 17.3.1，Relaxin 0.5.6。
+此包尚未在该手机上测试；本机只能检查签名、文件结构和加载配置。
+
+安装步骤
+1. 先用 TrollStore Lite 将原始、未注入插件的 VVebo IPA 覆盖装回。
+   保持应用标识 com.johnil.vvebo 不变，不要先卸载 VVebo。
+   这一步用于清除旧 TrollFools 注入与改签，避免重复加载。
+2. 在越狱生效状态下，将本 deb 交给 Sileo 或 Irisin 安装。
+   本包已经使用 RootHide 布局，无需再次通过 RootHide Patcher 转换。
+3. 如果 Umbra / RootHide 管理器对 VVebo 禁用了插件注入，允许该应用加载插件。
+4. 完全关闭 VVebo 后重新打开；按包管理器提示完成必要的注销操作。
+5. 测试启动、个人主页微博列表及粉丝列表。
+
+如果仍然闪退
+导出对应时间的 VVebo .ips 日志：
+设置 > 隐私与安全性 > 分析与改进 > 分析数据。
+同时说明 deb 是否已安装、是否已清除旧注入、VVebo 是否允许加载插件。
+
+卸载
+在包管理器卸载“VVeboFix (RootHide)”，然后重新打开 VVebo。
+本包没有安装、卸载脚本，不主动结束进程，也不处理 VVebo 的用户数据。
+
+包内容
+只包含提供的 VVeboFix 动态库、针对 com.johnil.vvebo 的加载规则及本文档。
+动态库的网络修复代码保持原样；调整了 RootHide 加载路径并重新做了 ad-hoc 签名。
