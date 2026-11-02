@@ -1,52 +1,42 @@
-# VVeboFix 的 Relaxin / RootHide 插件包
+# VVeboFix
 
-将用户提供的 `VVeboFix.dylib` 转为原生 RootHide 布局的 Debian 插件包。
-目标为 iPhone 15 Pro Max、iOS 17.3.1、Relaxin 0.5.6；不包含 VVebo App 本体。
+将 VVebo 主页/粉丝列表接口修复与本机已购功能兼容合并到一份通用动态库，提供
+Relaxin / RootHide deb、TrollFools 注入用 dylib，以及预注入 TrollStore IPA。
 
-当前版本 `1.0.1`。用户于 2026-11-02 反馈“注入成功”并要求本地定稿。
-此反馈仅确认注入成功，未分别确认启动、个人主页和粉丝列表的完整功能。
+当前合并版为 **1.1.0**，目标 App 为 VVebo 3.3.31。注入库同时包含 arm64 与 arm64e。
+越狱版目标为 iOS 15 及以上的 RootHide 环境；巨魔版应先确认设备与 App 能加载相应切片。
 
-已测试的原始安装包按原样保存在
-`releases/1.0.1/com.lhl.vvebofix_1.0.1_iphoneos-arm64e.deb`。
-定稿不替换其功能代码或包内文档，也不因本地提交、合并而再次升版。
+## 安装
 
-## 转换内容
+- **Relaxin / RootHide：** 安装 `dist/combined/com.lhl.vvebofix_1.1.0_iphoneos-arm64e.deb`。
+  同包升级 VVeboFix 1.0.1，并替换独立已购兼容包。包管理器可能提示移除旧兼容包。
+- **TrollFools：** 将 `dist/combined/VVeboFix_Combined_1.1.0_TrollStore.dylib`
+  注入未预注入的 VVebo。先移除旧 VVeboFix 与 VVeboPurchaseCompat 注入记录。
+- **TrollStore：** 直接安装
+  `dist/combined/VVebo_3.3.31_Combined_1.1.0_TrollStore.ipa`。
 
-- 安装到越狱根目录内的 `/Library/MobileSubstrate/DynamicLibraries/`，不硬编码 `/var/jb` 安装前缀。
-- 加载规则只匹配 `com.johnil.vvebo`。
-- 将 `/var/jb/...` 搜索路径改为 `@loader_path/.jbroot/...`，已有相同目标时去重。
-- 移除输入库的 TrollStore 特殊签名，改用 SHA-256 ad-hoc 签名；库不添加额外权限。
-- 包架构为 `iphoneos-arm64e`，保留输入库原有的 arm64e 机器代码。
-- 使用上游包标识 `com.lhl.vvebofix`，本次兼容转换版本为 `1.0.1`。
-
-不加入 Rootless Compat / AutoPatches：输入库只直接依赖系统库，未发现需要兼容层的第三方固定路径。
-不添加 `.jbroot` 的固定目标链接，由 RootHide 的安装、加载机制管理。
+安装方式只选一种。不同方式不要同时加载同名库。完整关闭 VVebo 后再重新打开。
+安装包由下面的构建命令生成；这些本地文件不随 Git 源码提交。
 
 ## 构建
 
-需要 macOS 的 Python 3 和 Xcode 命令行工具，不安装额外依赖：
+需要 macOS、Xcode 命令行工具及 Python 3。首次构建会从固定版本的 GitHub 地址获取
+VVeboFix 源码，并把临时副本放在忽略的 `build/` 目录；无需第三方 Python 依赖。
 
 ```sh
-python3 build_package.py
+python3 combined/build.py --ipa '/完整路径/VVebo_3.3.31_全权限砸壳.ipa'
 ```
 
-输出位于 `dist/com.lhl.vvebofix_1.0.1_iphoneos-arm64e.deb`。
-`input/VVeboFix.original.dylib` 是用户提供文件的副本，原文件不改动。
+不传 `--ipa` 时生成 deb 和 TrollFools 用 dylib；传入原 IPA 时，也会重签并生成预注入 IPA。
+只有 App IPA，没有 VVebo 的 App 源码，所以构建的是完整插件和重新打包后的 App，
+不是整个 VVebo 的源码编译。
 
-构建会检查签名和实际代码节是否保持一致，生成标准的
-`debian-binary`、`control.tar.gz`、`data.tar.gz`，文件在包内归 root 所有。
+## 验证状态
 
-手机安装与测试步骤见 `INSTALL.zh-CN.txt`。
-该文件保留初次打包时的测试说明，最新验证情况见 `VALIDATION.md`。
-结构及签名检查通过不能代替手机启动和网络功能测试。
+本机的 41 项检查、arm64/arm64e 插件编译、RootHide 包校验及整包签名检查已通过。
+合并版尚未在手机实际运行；冷启动、网络请求、Pro 状态、换肤及 iCloud 上传下载仍待实机验证。
+之前独立已购兼容 0.1.0 在手机出现白屏，0.1.1 修复了可复现的启动顺序问题，
+但尚无该版手机成功反馈。详见 [合并版检查记录](combined/VALIDATION.md)。
 
-## 参考资料
-
-- RootHide 路径规范：https://github.com/roothide/Developer/blob/main/roothide.md
-- RootHide Patcher 的路径改写及重签逻辑：https://github.com/roothide/RootHidePatcher/blob/master/patch.sh
-- 相关 VVeboFix 上游打包配置：https://github.com/nildeveloper/VVeboFix
-
-输入二进制由用户提供，不声称与上游发布文件逐字节一致。
-初始 `main` 没有提交，因此使用未提交的独立分支
-`codex/vvebofix-relaxin-roothide` 和 worktree 开发。
-用户确认后，通过本地提交和合并将该版本收录到 `main`；不推送、不发布或安装。
+上游来源及授权信息见 [UPSTREAM.md](combined/UPSTREAM.md)。上游未附独立 LICENSE；
+本仓库不为上游模块虚构授权。项目没有为整个仓库声明统一许可证。

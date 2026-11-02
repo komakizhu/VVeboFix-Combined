@@ -1,4 +1,4 @@
-# VVeboFix RootHide 1.0.1 验证记录
+# VVeboFix RootHide 1.0.1 历史验证记录
 
 版本：1.0.1
 目标环境：iPhone 15 Pro Max / iOS 17.3.1 / Relaxin 0.5.6
@@ -28,7 +28,5 @@
 
 ## 工作区状态
 
-开发分支：codex/vvebofix-relaxin-roothide。
-原 main 没有首个提交；使用 Git --orphan 创建独立 worktree 进行转换和打包。
-本地定稿在开发分支提交，并合并到本地 main，不推送、不发布或安装。
-Codex 托管 worktree 工具不支持这一空仓库起点，因此未能在应用中登记该 worktree。
+此记录只对应旧 1.0.1 RootHide 包，不代表合并版通过手机测试。
+合并版的最新检查见 [combined/VALIDATION.md](combined/VALIDATION.md)。
