@@ -1,5 +1,11 @@
 # VVeboFix 更新记录
 
+## Unreleased
+
+- 新增 `XHSNoRefresh` 小红书启动防刷新 RootHide 插件原型。
+- 覆盖启动/回前台时的首页初始 `homefeed` 请求；用户触摸后放行手动刷新和翻页。
+- 已完成本机策略测试、arm64/arm64e 编译及 RootHide 包构建；真机行为待验证。
+
 ## 1.1.0 — 合并版
 
 - 将 VVeboFix 主页与粉丝列表网络修复、已购功能兼容合入单一动态库。

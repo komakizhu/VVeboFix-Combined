@@ -31,6 +31,19 @@ python3 combined/build.py --ipa '/完整路径/VVebo_3.3.31_全权限砸壳.ipa'
 只有 App IPA，没有 VVebo 的 App 源码，所以构建的是完整插件和重新打包后的 App，
 不是整个 VVebo 的源码编译。
 
+## 小红书启动防刷新插件
+
+`xhs_no_refresh/` 是独立的 RootHide 插件原型，目标宿主为小红书
+`com.xingin.xhs`（同时兼容旧版 `com.xingin.discover`）。它在启动或回到前台时，
+默认一直拦截已识别的首页自动刷新请求，直到用户触摸；手动刷新和翻页仍然放行。
+
+```sh
+python3 xhs_no_refresh/build.py
+```
+
+该插件尚未在真实小红书 IPA 和手机上验证；完整说明见
+[`xhs_no_refresh/README.md`](xhs_no_refresh/README.md)。
+
 ## 验证状态
 
 本机的 41 项检查、arm64/arm64e 插件编译、RootHide 包校验及整包签名检查已通过。
