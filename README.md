@@ -41,7 +41,7 @@ python3 combined/build.py --ipa '/完整路径/VVebo_3.3.31_全权限砸壳.ipa'
 python3 xhs_no_refresh/build.py
 ```
 
-该插件尚未在真实小红书 IPA 和手机上验证；完整说明见
+已收到用户一次真实设备成功反馈，但没有取得对应 IPA、设备、系统和 App 版本；完整说明见
 [`xhs_no_refresh/README.md`](xhs_no_refresh/README.md)。
 
 ## 验证状态
