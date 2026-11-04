@@ -33,13 +33,23 @@ python3 combined/build.py --ipa '/完整路径/VVebo_3.3.31_全权限砸壳.ipa'
 
 ## 小红书启动防刷新插件
 
-`xhs_no_refresh/` 是独立的 RootHide 插件原型，目标宿主为小红书
+`xhs_no_refresh/` 是独立的越狱插件，目标宿主为小红书
 `com.xingin.xhs`（同时兼容旧版 `com.xingin.discover`）。它在启动或回到前台时，
 默认一直拦截已识别的首页自动刷新请求，直到用户触摸；手动刷新和翻页仍然放行。
 
 ```sh
 python3 xhs_no_refresh/build.py
 ```
+
+构建会生成 Rootful、Rootless、RootHide 三种 `.deb`，以及可供 TrollStore/TrollFools
+注入的通用动态库。正式文件名为 `小红书防自动刷新-0.1.0-rootful.deb`、
+`小红书防自动刷新-0.1.0-rootless.deb`、`小红书防自动刷新-0.1.0-roothide.deb` 和
+`小红书防自动刷新-0.1.0-1-trollstore.dylib`。安装路径和注入说明见
+[`xhs_no_refresh/README.md`](xhs_no_refresh/README.md)。
+
+这四个产物已同步到 [Komaki Zhu 软件源](https://komakizhu.github.io/komaki-packages/)，
+国内友好入口为 [jsDelivr](https://cdn.jsdelivr.net/gh/komakizhu/komaki-packages@main/)。
+源索引中的插件封面使用小红书 App 官方图标。
 
 已收到用户一次真实设备成功反馈，但没有取得对应 IPA、设备、系统和 App 版本；完整说明见
 [`xhs_no_refresh/README.md`](xhs_no_refresh/README.md)。

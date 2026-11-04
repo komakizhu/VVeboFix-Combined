@@ -1,7 +1,7 @@
-# XHS No Startup Refresh
+# 小红书防自动刷新 / XHS No Startup Refresh
 
-这是一个面向小红书 iOS 客户端的 RootHide 插件原型，目标是解决“打开 App
-先显示一批内容，随后没有任何操作就自动刷新，刚才的笔记消失”的问题。
+这是一个面向小红书 iOS 客户端的越狱插件，目标是解决“打开 App 先显示一批内容，
+随后没有任何操作就自动刷新，刚才的笔记消失”的问题。
 
 ## 工作方式
 
@@ -19,8 +19,21 @@
 
 ## 安装与关闭
 
-安装 RootHide deb 后，完整退出小红书再重新打开。插件没有新增设置页面；可通过应用偏好
-关闭：
+本项目提供三种越狱 `.deb` 和一个 TrollStore/TrollFools 动态库。文件名统一使用
+“中文名-版本-环境”格式：
+
+| 环境 | 文件名 | 安装位置 |
+| --- | --- | --- |
+| Rootful | `小红书防自动刷新-0.1.0-rootful.deb` | `/Library/MobileSubstrate/DynamicLibraries` |
+| Rootless | `小红书防自动刷新-0.1.0-rootless.deb` | `/var/jb/Library/MobileSubstrate/DynamicLibraries` |
+| RootHide | `小红书防自动刷新-0.1.0-roothide.deb` | RootHide 的动态库目录 |
+| TrollStore / TrollFools | `小红书防自动刷新-0.1.0-1-trollstore.dylib` | 注入到小红书进程 |
+
+安装与你的环境相符的 `.deb` 后，完整退出小红书再重新打开。TrollStore 版本是动态库，
+需要用 TrollFools 或其他支持动态库注入的 TrollStore 工具加载；本项目没有用户当前版本
+的小红书 IPA，因此不伪造预注入 IPA。
+
+插件没有新增设置页面；可通过应用偏好关闭：
 
 ```sh
 defaults write com.xingin.xhs XHSNoRefreshDisabled -bool YES

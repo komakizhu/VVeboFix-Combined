@@ -6,7 +6,10 @@
   触摸后放行、保留翻页、忽略无关接口、支持关闭开关。
 - Python 构建脚本语法检查通过。
 - 同一源码编译为 arm64 与 arm64e，合成通用动态库并通过 ad-hoc `codesign --verify --strict`。
-- RootHide deb 成员、控制信息、应用过滤配置和 `md5sums` 已检查。
+- Rootful、Rootless、RootHide 三个 deb 的成员、控制信息、应用过滤配置和 `md5sums` 已检查；
+  Rootless 包确认写入 `/var/jb`，RootHide 包使用 `iphoneos-arm64e` 架构。
+- TrollStore/TrollFools 通用动态库已生成，文件名为
+  `小红书防自动刷新-0.1.0-1-trollstore.dylib`，包含 arm64 与 arm64e 切片并通过严格签名检查。
 - 公开资料中存在与本需求相同的用户反馈：打开 App 先显示感兴趣的首页内容，随后无操作自动刷新，
   刚显示的内容消失。[公开反馈](https://www.sina.cn/news/detail/5342150234997216.html)
 
@@ -20,5 +23,6 @@
 
 - 本机没有用户当前版本的小红书 IPA 和目标手机抓包，无法复核这次设备实际经过的是哪一层网络 Hook。
 - 用户已反馈目标功能成功，但冷启动、回前台、手动下拉、无缓存首次安装和后台网络行为没有逐项独立记录。
+- 本机没有小红书 IPA，TrollStore 版本只验证动态库产物，没有生成或声称生成预注入 IPA。
 - 如果 App 使用自有网络栈，或更新后改变 `refresh_type`，插件需要根据真机日志增加对应 Hook；
   不能仅凭本机编译结果宣称已修好。

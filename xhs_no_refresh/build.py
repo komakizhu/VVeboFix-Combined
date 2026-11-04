@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Build the XHS startup-feed refresh blocker as a RootHide deb."""
+"""Build the XHS startup-feed refresh blocker for every supported injector."""
 
 from __future__ import annotations
 
 import hashlib
+from dataclasses import dataclass
 from pathlib import Path
 import plistlib
 import shutil
@@ -12,9 +13,29 @@ import subprocess
 ROOT = Path(__file__).resolve().parent.parent
 VERSION = "0.1.0"
 PACKAGE = "com.local.xhs.norefresh"
+DISPLAY_NAME = "小红书防自动刷新"
 LIBRARY = "XHSNoRefresh.dylib"
 BUILD = ROOT / "build/xhs-no-refresh"
 DIST = ROOT / "dist/xhs-no-refresh"
+
+
+@dataclass(frozen=True)
+class Variant:
+    """One package layout and its user-visible artifact suffix."""
+
+    suffix: str
+    package_version: str
+    architecture: str
+    data_prefix: str
+    label: str
+
+
+VARIANTS = (
+    Variant("rootful", f"{VERSION}+1-rootful", "iphoneos-arm", "", "Rootful"),
+    Variant("rootless", f"{VERSION}+1-rootless", "iphoneos-arm64", "var/jb", "Rootless"),
+    Variant("roothide", f"{VERSION}+1-roothide", "iphoneos-arm64e", "", "RootHide"),
+)
+TROLLSTORE_ARTIFACT = f"{DISPLAY_NAME}-{VERSION}-1-trollstore.dylib"
 
 
 def run(*args: str) -> str:
@@ -95,24 +116,32 @@ def build_library() -> Path:
     run("codesign", "--verify", "--strict", str(library))
     if set(run("xcrun", "lipo", "-archs", str(library)).split()) != {"arm64", "arm64e"}:
         raise RuntimeError("Expected arm64 and arm64e slices")
+    # TrollStore/TrollFools users inject this universal dylib directly.  The
+    # `1-trollstore` suffix is intentional: it distinguishes this non-DEB
+    # artifact from the three jailbreak packages in source listings.
+    shutil.copyfile(library, DIST / TROLLSTORE_ARTIFACT)
+    # Keep the original machine-friendly filename as a compatibility alias for
+    # existing local users; the Chinese name is the canonical published file.
     shutil.copyfile(library, DIST / f"XHSNoRefresh_{VERSION}_TrollStore.dylib")
     return library
 
 
-def build_deb(library: Path) -> Path:
-    base = "Library/MobileSubstrate/DynamicLibraries/"
+def build_deb(library: Path, variant: Variant) -> Path:
+    prefix = f"{variant.data_prefix}/" if variant.data_prefix else ""
+    base = prefix + "Library/MobileSubstrate/DynamicLibraries/"
     files = {
         base + LIBRARY: (library.read_bytes(), 0o755),
         base + "XHSNoRefresh.plist": (
             plistlib.dumps({"Filter": {"Bundles": [
                 "com.xingin.xhs", "com.xingin.discover"
             ]}}), 0o644),
-        f"usr/share/doc/{PACKAGE}/README.md": (
+        f"{prefix}usr/share/doc/{PACKAGE}/README.md": (
             (ROOT / "xhs_no_refresh/README.md").read_bytes(), 0o644),
     }
     control = (
-        f"Package: {PACKAGE}\nName: XHS No Startup Refresh\nVersion: {VERSION}\n"
-        "Architecture: iphoneos-arm64e\nSection: Tweaks\nPriority: optional\n"
+        f"Package: {PACKAGE}\nName: {DISPLAY_NAME} / XHS No Startup Refresh ({variant.label})\n"
+        f"Version: {variant.package_version}\nArchitecture: {variant.architecture}\n"
+        "Section: Tweaks\nPriority: optional\n"
         "Maintainer: Local Compatibility Build\n"
         "Depends: firmware (>= 15.0), mobilesubstrate\n"
         "Description: Keep Xiaohongshu homefeed stable on app activation\n"
@@ -127,7 +156,7 @@ def build_deb(library: Path) -> Path:
                                    "md5sums": (sums, 0o644)}),
         "data.tar.gz": tar_gz(files),
     }
-    target = DIST / f"{PACKAGE}_{VERSION}_iphoneos-arm64e.deb"
+    target = DIST / f"{DISPLAY_NAME}-{VERSION}-{variant.suffix}.deb"
     target.write_bytes(b"!<arch>\n" + b"".join(
         ar_member(name, contents) for name, contents in members.items()))
     return target
@@ -135,8 +164,9 @@ def build_deb(library: Path) -> Path:
 
 def main() -> None:
     library = build_library()
-    print("RootHide deb:", build_deb(library))
-    print("TrollStore dylib:", DIST / f"XHSNoRefresh_{VERSION}_TrollStore.dylib")
+    for variant in VARIANTS:
+        print(f"{variant.label} deb:", build_deb(library, variant))
+    print("TrollStore dylib:", DIST / TROLLSTORE_ARTIFACT)
     print("Device startup behavior: not tested on a phone.")
 
 
